@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using nothinbutdotnetprep.specs.utility;
 
 namespace nothinbutdotnetprep.collections
 {
@@ -9,77 +10,88 @@ namespace nothinbutdotnetprep.collections
 
         public MovieLibrary(IList<Movie> list_of_movies)
         {
-            this.movies = list_of_movies;
+            movies = list_of_movies;
         }
 
         public IEnumerable<Movie> all_movies()
         {
-            return this.movies;
+            foreach (var movie in movies)
+                yield return movie;
         }
 
         public void add(Movie movie)
         {
-            throw new NotImplementedException();
+            if (does_not_contains(movie))
+                movies.Add(movie);
+        }
+
+        bool does_not_contains(Movie movie)
+        {
+            return !contains(movie);
+        }
+
+        bool contains(Movie movie)
+        {
+            if (movies.Contains(movie))
+                return true;
+
+            foreach (var movie1 in movies)
+            {
+                if (movie1.title == movie.title)
+                    return true;
+            }
+
+            return false;
         }
 
         public IEnumerable<Movie> sort_all_movies_by_title_descending()
         {
-            throw new NotImplementedException();
-        }
+            var sorted_movies = new SortedList<string, Movie>(new ReverseComparer<string>());
+            foreach (var movie in movies)
+                sorted_movies.Add(movie.title, movie);
 
-        public IEnumerable<Movie> all_movies_published_by_pixar()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<Movie> all_movies_published_by_pixar_or_disney()
-        {
-            throw new NotImplementedException();
+            foreach (var sorted_movie in sorted_movies)
+                yield return sorted_movie.Value;
         }
 
         public IEnumerable<Movie> sort_all_movies_by_title_ascending()
         {
-            throw new NotImplementedException();
+            var sorted_movies = new SortedList<string, Movie>();
+            foreach (var movie in movies)
+                sorted_movies.Add(movie.title, movie);
+
+            foreach (var sorted_movie in sorted_movies)
+                yield return sorted_movie.Value;
         }
 
         public IEnumerable<Movie> sort_all_movies_by_movie_studio_and_year_published()
         {
-            throw new NotImplementedException();
-        }
+            var sorted_by_production_studio = new SortedList<Tuple<ProductionStudio, DateTime>, Movie>(new ProductionStudioAndDateTimeComparer());
+            foreach (var movie in movies)
+                sorted_by_production_studio.Add(new Tuple<ProductionStudio, DateTime>(movie.production_studio, movie.date_published), movie);
 
-        public IEnumerable<Movie> all_movies_not_published_by_pixar()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<Movie> all_movies_published_after(int year)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<Movie> all_movies_published_between_years(int startingYear, int endingYear)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<Movie> all_kid_movies()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<Movie> all_action_movies()
-        {
-            throw new NotImplementedException();
+            foreach (var movie in sorted_by_production_studio)
+                yield return movie.Value;
         }
 
         public IEnumerable<Movie> sort_all_movies_by_date_published_descending()
         {
-            throw new NotImplementedException();
+            var sorted_movies = new SortedList<DateTime, Movie>(new ReverseComparer<DateTime>());
+            foreach (var movie in movies)
+                sorted_movies.Add(movie.date_published, movie);
+            
+            foreach (var sorted_movie in sorted_movies)
+                yield return sorted_movie.Value;
         }
 
         public IEnumerable<Movie> sort_all_movies_by_date_published_ascending()
         {
-            throw new NotImplementedException();
+            var sorted_movies = new SortedList<DateTime, Movie>();
+            foreach (var movie in movies)
+                sorted_movies.Add(movie.date_published, movie);
+
+            foreach (var sorted_movie in sorted_movies)
+                yield return sorted_movie.Value;
         }
     }
 }
